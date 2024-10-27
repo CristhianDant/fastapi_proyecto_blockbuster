@@ -18,6 +18,9 @@ app.add_middleware(ErrorHandler)
 from Cliente.router import cliente_router
 app.include_router(cliente_router)
 
+from Personal.router import personal_router
+app.include_router(personal_router)
+
 ## Create database tables
 Base.metadata.create_all(bind=engine)
 
