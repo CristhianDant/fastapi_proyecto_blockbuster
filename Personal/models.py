@@ -35,12 +35,7 @@ class Personal(BaseModel):
             }
         }
 
-# class Personal_get(Base):
-#     __tablename__ = 'Personal'
-#     __table_args__ = {'extend_existing': True}
-#     idPersonal = Column(Integer)
-#     nombre = Column(String(50))
-#     direcion = Column(String(200))
-#     telefono = Column(String(9))
-#     fecha_registro = Column(DateTime)
-#     email = Column(String(100))
+class UpdatePasswordRequest(BaseModel):
+    idPersonal: int = Field(..., example=1)
+    password_legaci: str = Field(..., example="old_password123")
+    new_password: str = Field(..., example="new_password456")

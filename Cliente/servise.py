@@ -1,5 +1,6 @@
 from datetime import datetime
 from .models import Cliente , Cliente_database 
+from sqlalchemy import select
 
 class ClientService(Cliente_database):
     def __init__(self , db):
@@ -11,6 +12,34 @@ class ClientService(Cliente_database):
         """
         result = self.db.query(Cliente_database).all()
         return result
+    
+
+    def get_clientes_customer(self):
+        list_clientes= []
+        # ## Desendente
+        # result = self.db.execute(select(Cliente_database).order_by(Cliente_database.idCliente.desc()))
+        # ## Ascendente
+        # result = self.db.execute(select(Cliente_database).order_by(Cliente_database.idCliente.asc()))
+        # clientes = result.scalars().all()
+        result = self.db.execute(
+            select(Cliente_database.idCliente,
+                Cliente_database.nombre,
+                Cliente_database.direcion,
+                Cliente_database.telefono,
+                Cliente_database.fecha_registro)
+        )
+        
+        
+        for cliente in result:
+            list_clientes.append({
+                "idCliente": cliente.idCliente,
+                "nombre": cliente.nombre,
+                "direcion": cliente.direcion,
+                "telefono": cliente.telefono,
+                "fecha_registro": cliente.fecha_registro
+            })
+
+        return list_clientes
     
     def get_cliente(self, idCliente):
         """

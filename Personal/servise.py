@@ -3,20 +3,48 @@ from datetime import datetime
 
 from .models import Personal , Personal_database 
 
+from sqlalchemy import select
+
 class PersonalService(Personal_database):
     def __init__(self , db):
         self.db = db
+
+    def get_personals_deprecate(self):
+        """
+        Get all the personals
+        """
+        result = self.db.query(Personal_database).all()
+        return result
 
     def get_personals(self):
         """
         Get all the personals
         """
-        result = self.db.query(Personal_database).all()
+        personals_list = []
+        result = self.db.execute(
+            select(
+            Personal_database.idPersonal,
+            Personal_database.nombre,
+            Personal_database.direcion,
+            Personal_database.telefono,
+            Personal_database.fecha_registro,
+            Personal_database.email)
+            .order_by(Personal_database.idPersonal.desc())
+        )
 
         for personal in result:
-            personal.password = '********'
-        return result
+            personals_list.append({
+                "idPersonal": personal.idPersonal,
+                "nombre": personal.nombre,
+                "direcion": personal.direcion,
+                "telefono": personal.telefono,
+                "fecha_registro": personal.fecha_registro,
+                "email": personal.email
+            })
 
+        return personals_list
+    
+    
     def get_personal(self, idPersonal):
         """
         Get a personal by id
@@ -44,12 +72,40 @@ class PersonalService(Personal_database):
         self.db.refresh(new_personal)
         return new_personal
     
+    def update_password(self, data : dict):
+        """
+        Update password 
+        DATA {
+            idPersonal: int
+            password_legaci: str
+            new_password: str
+        }
+        """
+        print(f'estamo en el servicio')
+        ## BUSCAR EL USUARIO
+        personal = self.get_personal(data['idPersonal'])
+        ## ESTRAER EL PASSWORD
+        password = personal.password
+        ## VALIDAR EL PASSWORD
+        
+        import pdb; pdb.set_trace()
+
+        if bcrypt.checkpw(data['password_legaci'].encode('utf-8'), password.encode('utf-8')):
+            ## HASHEAR EL NUEVO PASSWORD
+            hashed_password = bcrypt.hashpw(data['new_password'].encode('utf-8'), bcrypt.gensalt())
+            ## ACTUALIZAR EL PASSWORD
+            personal.password = hashed_password
+            self.db.commit()
+            self.db.refresh(personal)
+            return personal
+        else:
+            return None
     def update_personal(self, idPersonal, personal: Personal):
         """
         Update a personal
         """
         # Valores que no se deben actualizar
-        list_exclude_fields = ['idPersonal', 'fecha_registro']
+        list_exclude_fields = ['idPersonal', 'fecha_registro' , 'password']
 
         personal_update = self.get_personal(idPersonal)
 
