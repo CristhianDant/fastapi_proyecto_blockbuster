@@ -88,7 +88,7 @@ class PersonalService(Personal_database):
         password = personal.password
         ## VALIDAR EL PASSWORD
         
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
 
         if bcrypt.checkpw(data['password_legaci'].encode('utf-8'), password.encode('utf-8')):
             ## HASHEAR EL NUEVO PASSWORD
