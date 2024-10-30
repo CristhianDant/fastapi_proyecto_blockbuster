@@ -24,6 +24,9 @@ app.include_router(personal_router)
 from Peliculas.router import peliculas_router
 app.include_router(peliculas_router)
 
+from Renta.router import renta_router
+app.include_router(renta_router)
+
 ## Create database tables
 Base.metadata.create_all(bind=engine)
 
