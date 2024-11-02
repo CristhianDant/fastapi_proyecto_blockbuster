@@ -1,6 +1,6 @@
 from config.database import Base
 from sqlalchemy import Column, Integer, String , DateTime
-
+from sqlalchemy.orm import relationship
 from pydantic import BaseModel , Field
 from typing import Optional
 
@@ -12,6 +12,9 @@ class Cliente_database (Base):
     direcion = Column(String(200))
     telefono = Column(String(9))
     fecha_registro = Column(DateTime)
+
+    rentas = relationship("Renta_encabezado_database", back_populates="cliente")
+
 
 
 class Cliente(BaseModel):

@@ -1,9 +1,9 @@
+from sqlalchemy import select
+
 from .models import Renta_encabezado , Renta_encabezado_database , Renta_detalle , Renta_detalle_database , datetime
-
-
-from Peliculas.servise import PeliculasService
-from Personal.servise import PersonalService
-from Cliente.servise import ClientService
+from Peliculas.servise import Peliculas_database , PeliculasService
+from Personal.servise import Personal_database
+from Cliente.servise import Cliente_database
 
 class RentaServise:
 
@@ -18,12 +18,70 @@ class RentaServise:
 
         return result
     
+    def get_list_rentas_between_dates(self):
+        """
+        Get all the rentas between two dates
+        """
+        stmt = select(
+            Renta_encabezado_database.idRenta_enc,
+            Renta_encabezado_database.fecha_inicio,
+            Renta_encabezado_database.fecha_fin,
+            Renta_encabezado_database.fin_renta,
+            Renta_encabezado_database.total,
+            Renta_encabezado_database.iva,
+            Renta_encabezado_database.subtotal,
+            Renta_encabezado_database.idCliente,
+            Cliente_database.nombre.label("cliente"),
+            Renta_encabezado_database.idPersonal,
+            Personal_database.nombre.label("personal")
+        ).join(
+            Cliente_database , Renta_encabezado_database.idCliente == Cliente_database.idCliente
+        ).join(
+            Personal_database , Renta_encabezado_database.idPersonal == Personal_database.idPersonal
+        )
+
+        result = self.db.execute(stmt).mappings().all()
+        
+        return result
+
+    
     def get_renta(self, idRenta_enc):
         """
         Get a renta by id
         """
-        renta_enc = self.db.query(Renta_encabezado_database).filter(Renta_encabezado_database.idRenta_enc == idRenta_enc).first()
-        renta_det = self.db.query(Renta_detalle_database).filter(Renta_detalle_database.idRenta_enc == idRenta_enc).all()
+        #renta_enc = self.db.query(Renta_encabezado_database).filter(Renta_encabezado_database.idRenta_enc == idRenta_enc).first()
+        renta_enc = self.db.execute(
+            select(
+                Renta_encabezado_database.idRenta_enc,
+                Renta_encabezado_database.fecha_inicio,
+                Renta_encabezado_database.fecha_fin,
+                Renta_encabezado_database.fin_renta,
+                Renta_encabezado_database.total,
+                Renta_encabezado_database.iva,
+                Renta_encabezado_database.subtotal,
+                Renta_encabezado_database.idCliente,
+                Cliente_database.nombre.label("cliente"),
+                Renta_encabezado_database.idPersonal,
+                Personal_database.nombre.label("personal")
+            ).join(
+                Cliente_database , Renta_encabezado_database.idCliente == Cliente_database.idCliente
+            ).join(
+                Personal_database , Renta_encabezado_database.idPersonal == Personal_database.idPersonal
+            ).where(Renta_encabezado_database.idRenta_enc == idRenta_enc)
+        ).mappings().first()
+
+    
+        renta_det = self.db.execute(
+            select(
+                Renta_detalle_database.idRenta_det,
+                Renta_detalle_database.idRenta_enc,
+                Renta_detalle_database.idPelicula,
+                Renta_detalle_database.cantidad,
+                Renta_detalle_database.precio,
+                Peliculas_database.titulo.label("pelicula")
+            ).join(Peliculas_database , Renta_detalle_database.idPelicula == Peliculas_database.idPelicula)
+            .where(Renta_detalle_database.idRenta_enc == idRenta_enc)
+        ).mappings().all()
 
         renta = {
             "renta_enc": renta_enc,
@@ -47,7 +105,7 @@ class RentaServise:
             pelicula = PeliculasService(self.db).get_pelicula(renta_det_data['idPelicula'])
             if not pelicula:
                 raise ValueError("Pelicula no encontrada")
-            renta_det_data['precio'] = pelicula.precio
+            renta_det_data['precio'] = pelicula.costo
             new_renta_det = Renta_detalle_database(**renta_det_data)
             total += renta_det_data['cantidad'] * renta_det_data['precio']
             PeliculasService(self.db).disminuir_cantidad(idPelicula=renta_det_data['idPelicula'], cantidad=renta_det_data['cantidad'])
@@ -62,7 +120,9 @@ class RentaServise:
 
         renta_enc_data = renta_enc.model_dump()
 
-        total = self._reguister_renta_det(renta_enc.idRenta_enc, detalle)
+        id = self.get_ulitma_renta()
+
+        total = self._reguister_renta_det(id , detalle)
         # Valores por defecto
         renta_enc_data['fecha_inicio'] = datetime.now()
         renta_enc_data['fin_renta'] 
@@ -135,11 +195,17 @@ class RentaServise:
         
         renta_enc = self.db.query(Renta_encabezado_database).filter(Renta_encabezado_database.idRenta_enc == idRenta_enc).first()
 
-        if renta_enc['fin_renta']:
-            raise ValueError("La renta ya ha sido finalizada")
 
-        renta_enc['fin_renta'] = True
-        renta_enc['fecha_fin'] = datetime.now()
+        if renta_enc is None:
+            raise ValueError("La renta no existe")
+
+        if renta_enc.fin_renta:
+            raise ValueError("La renta ya ha sido finalizada")
+        
+        
+
+        renta_enc.fin_renta = True
+        renta_enc.fecha_fin = datetime.now()
 
         self.db.commit()
         self.db.refresh(renta_enc)

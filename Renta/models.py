@@ -1,4 +1,5 @@
 from config.database import Base
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String , Float, DateTime , ForeignKey , Boolean
 from pydantic import BaseModel , Field
 from typing import Optional
@@ -19,6 +20,9 @@ class Renta_encabezado_database(Base):
     subtotal = Column(Float)
     iva = Column(Float)
 
+    cliente = relationship("Cliente_database", back_populates="rentas")
+    personal = relationship("Personal_database", back_populates="rentas")
+
 
 class Renta_encabezado(BaseModel):
     idRenta_enc: Optional[int] = Field(None)
@@ -27,9 +31,9 @@ class Renta_encabezado(BaseModel):
     fin_renta: Optional[bool] = Field(None)
     idPersonal: int 
     idCliente: int
-    total: float = Field(gt=0)
-    subtotal: float = Field(gt=0)
-    iva: float = Field(gt=0)
+    total: Optional[float] = Field(gt=0)
+    subtotal: Optional[float] = Field(gt=0)
+    iva: Optional[float] = Field(gt=0)
 
     class Config:
         from_attributes = True
@@ -53,6 +57,7 @@ class Renta_detalle_database(Base):
     idPelicula = Column(Integer, ForeignKey('Peliculas.idPelicula'))
     cantidad = Column(Integer)
     precio = Column(Float)
+    pelicula = relationship("Peliculas_database")
 
 
 class Renta_detalle(BaseModel):
@@ -60,7 +65,7 @@ class Renta_detalle(BaseModel):
     idRenta_enc: int
     idPelicula: int
     cantidad: int = Field(gt=0)
-    precio: float = Field(gt=0)
+    precio: Optional[float] = Field(gt=0)
 
     class Config:
         from_attributes = True

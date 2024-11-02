@@ -1,4 +1,5 @@
 from config.database import Base
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String , DateTime  
 from pydantic import BaseModel , Field
 from typing import Optional
@@ -13,6 +14,9 @@ class Personal_database(Base):
     fecha_registro = Column(DateTime)
     email = Column(String(100))
     password = Column(String(100))
+
+    rentas = relationship("Renta_encabezado_database", back_populates="personal")
+
 
 class Personal(BaseModel):
     idPersonal: Optional[int] = Field(None)

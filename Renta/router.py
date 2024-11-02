@@ -11,7 +11,7 @@ renta_router = APIRouter()
 @renta_router.get('/rentas', tags=['rentas'], status_code=200)
 def get_rentas():
     db = Session()
-    result = RentaServise(db).get_rentas()
+    result = RentaServise(db).get_list_rentas_between_dates()
     return JSONResponse(status_code=200, content=jsonable_encoder(result))
 
 @renta_router.get('/rentas/{idRenta_enc}', tags=['rentas'], status_code=status.HTTP_200_OK)
