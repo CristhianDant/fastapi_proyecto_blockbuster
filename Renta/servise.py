@@ -14,11 +14,29 @@ class RentaServise:
         """
         Get all the rentas
         """
-        result = self.db.query(Renta_encabezado_database).order_by(Renta_encabezado_database.idRenta_enc.desc()).limit(30).all()
+        result = self.db.execute(
+            select(
+                Renta_encabezado_database.idRenta_enc,
+                Renta_encabezado_database.fecha_inicio,
+                Renta_encabezado_database.fecha_fin,
+                Renta_encabezado_database.fin_renta,
+                Renta_encabezado_database.total,
+                Renta_encabezado_database.iva,
+                Renta_encabezado_database.subtotal,
+                Renta_encabezado_database.idCliente,
+                Cliente_database.nombre.label("cliente"),
+                Renta_encabezado_database.idPersonal,
+                Personal_database.nombre.label("personal")
+            ).join(
+                Cliente_database , Renta_encabezado_database.idCliente == Cliente_database.idCliente
+            ).join(
+                Personal_database , Renta_encabezado_database.idPersonal == Personal_database.idPersonal
+            )
+        ).mappings().all()
 
         return result
     
-    def get_list_rentas_between_dates(self):
+    def get_list_rentas_between_dates(self , fecha_inicio , fecha_fin):
         """
         Get all the rentas between two dates
         """
@@ -38,6 +56,10 @@ class RentaServise:
             Cliente_database , Renta_encabezado_database.idCliente == Cliente_database.idCliente
         ).join(
             Personal_database , Renta_encabezado_database.idPersonal == Personal_database.idPersonal
+        ).where(
+            Renta_encabezado_database.fecha_inicio >= fecha_inicio
+        ).where(
+            Renta_encabezado_database.fecha_inicio <= fecha_fin
         )
 
         result = self.db.execute(stmt).mappings().all()

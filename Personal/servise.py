@@ -15,6 +15,21 @@ class PersonalService(Personal_database):
         """
         result = self.db.query(Personal_database).all()
         return result
+    
+    def get_personals_email(self, email):
+        """
+        Get all the personals
+        """
+        result = self.db.query(Personal_database).filter(Personal_database.email == email).first()
+        
+        if not result:
+            return None
+        
+        
+        return result
+
+    
+
 
     def get_personals(self):
         """
@@ -30,28 +45,30 @@ class PersonalService(Personal_database):
             Personal_database.fecha_registro,
             Personal_database.email)
             .order_by(Personal_database.idPersonal.desc())
-        )
+        ).mappings().all()
 
-        for personal in result:
-            personals_list.append({
-                "idPersonal": personal.idPersonal,
-                "nombre": personal.nombre,
-                "direcion": personal.direcion,
-                "telefono": personal.telefono,
-                "fecha_registro": personal.fecha_registro,
-                "email": personal.email
-            })
-
-        return personals_list
-    
+        return result    
     
     def get_personal(self, idPersonal):
         """
         Get a personal by id
         """
-        result = self.db.query(Personal_database).filter(Personal_database.idPersonal == idPersonal).first()
-        if result:
-            result.password = '********'
+        # result = self.db.query(Personal_database).filter(Personal_database.idPersonal == idPersonal).first()
+        # if result:
+        #     result.password = '********'
+        # return result
+
+        result = self.db.execute(
+            select(
+            Personal_database.idPersonal,
+            Personal_database.nombre,
+            Personal_database.direcion,
+            Personal_database.telefono,
+            Personal_database.fecha_registro,
+            Personal_database.email)
+            .where(Personal_database.idPersonal == idPersonal)
+        ).mappings().first()
+
         return result
     
     def create_personal(self, personal: Personal):

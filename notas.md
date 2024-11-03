@@ -1,6 +1,9 @@
 
 ### Lista de partes de por hacer en el proyecto 
 
-1. Hacer pruevas en contraña update_password 
-2. Crear las api de Rentas y probarlas 
-3. Generar toda la documentacion necesaria
+¿Que necesita este proyecto para ser presentado ? 
+
+1. Crear toda la documentacion de la api 
+   1. descripcion
+   2. examples de de la api 
+   3. pruevas de todo el funcionamiento 

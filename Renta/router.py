@@ -3,16 +3,23 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
 from config.database import Session
-from .servise import RentaServise , Renta_encabezado , Renta_detalle
+from .servise import RentaServise , Renta_encabezado , Renta_detalle , datetime
+from middlewares.JWT_bearer import JWTBearer
 
 ## Create a new router
 renta_router = APIRouter()
 
-@renta_router.get('/rentas', tags=['rentas'], status_code=200)
+@renta_router.get('/rentas', tags=['rentas'], status_code=200 , dependencies=[Depends(JWTBearer())])
 def get_rentas():
     db = Session()
-    result = RentaServise(db).get_list_rentas_between_dates()
+    result = RentaServise(db).get_rentas()
     return JSONResponse(status_code=200, content=jsonable_encoder(result))
+
+@renta_router.get('/rentas_between_dates', tags=['rentas'], status_code=status.HTTP_200_OK)
+def get_list_rentas_between_dates(fecha_inicio: datetime = Query(... , example='2023-09-20') , fecha_fin: datetime = Query( ... , example='2023-09-20')):
+    db = Session()
+    result = RentaServise(db).get_list_rentas_between_dates(fecha_inicio, fecha_fin)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(result))
 
 @renta_router.get('/rentas/{idRenta_enc}', tags=['rentas'], status_code=status.HTTP_200_OK)
 def get_renta(idRenta_enc:int):
