@@ -9,7 +9,8 @@ from middlewares.JWT_bearer import JWTBearer
 ## Create a new router
 renta_router = APIRouter()
 
-@renta_router.get('/rentas', tags=['rentas'], status_code=200 , dependencies=[Depends(JWTBearer())])
+@renta_router.get('/rentas', tags=['rentas'],
+    status_code=status.HTTP_200_OK)
 def get_rentas():
     db = Session()
     result = RentaServise(db).get_rentas()
@@ -31,7 +32,9 @@ def get_renta(idRenta_enc:int):
     return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(result))
 
 
-@renta_router.post('/rentas', tags=['rentas'], status_code=status.HTTP_201_CREATED)
+@renta_router.post('/rentas', tags=['rentas'],
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(JWTBearer())])
 def create_renta(renta_enc: Renta_encabezado = Body(), detalle: list[Renta_detalle] = Body()):
     db = Session()
     RentaServise(db).create_renta(renta_enc, detalle)
@@ -41,7 +44,9 @@ def create_renta(renta_enc: Renta_encabezado = Body(), detalle: list[Renta_detal
         content={"message": "Renta creada"}
     )
 
-@renta_router.put('/rentas/{idRenta_enc}', tags=['rentas'], status_code=status.HTTP_200_OK)
+@renta_router.put('/rentas/{idRenta_enc}', tags=['rentas']
+    , status_code=status.HTTP_200_OK,
+    dependencies=[Depends(JWTBearer())])
 def update_renta(idRenta_enc:int, renta_enc: Renta_encabezado = Body()):
     db = Session()
     RentaServise(db).update_renta(idRenta_enc, renta_enc)
@@ -70,7 +75,9 @@ def get_ultima_renta():
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({"idRenta_enc": result}))
 
-@renta_router.put('/finalizar_renta/{idRenta_enc}', tags=['rentas'], status_code=status.HTTP_200_OK)
+@renta_router.put('/finalizar_renta/{idRenta_enc}', tags=['rentas'],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(JWTBearer())])
 def finalizar_renta(idRenta_enc:int):
     db = Session()
     RentaServise(db).finalizar_renta(idRenta_enc=idRenta_enc)

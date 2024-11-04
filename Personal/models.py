@@ -28,7 +28,7 @@ class Personal(BaseModel):
     password: str = Field(min_length=4 , max_length=100)
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         json_schema_extra = {
             "example": {
                 "nombre": "Juan",

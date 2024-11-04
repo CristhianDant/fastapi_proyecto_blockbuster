@@ -31,20 +31,16 @@ class Renta_encabezado(BaseModel):
     fin_renta: Optional[bool] = Field(None)
     idPersonal: int 
     idCliente: int
-    total: Optional[float] = Field(gt=0)
-    subtotal: Optional[float] = Field(gt=0)
-    iva: Optional[float] = Field(gt=0)
+    total: Optional[float] = Field(None)
+    subtotal: Optional[float] = Field(None)
+    iva: Optional[float] = Field(None)
 
     class Config:
         from_attributes = True
         json_schema_extra = {
             "example": {
-                "fin_renta": False,
                 "idPersonal": 1,
-                "idCliente": 1,
-                "total": 100.0,
-                "subtotal": 82.0,
-                "iva": 18.0
+                "idCliente": 1
             }
         }
 
@@ -62,18 +58,16 @@ class Renta_detalle_database(Base):
 
 class Renta_detalle(BaseModel):
     idRenta_det: Optional[int] = Field(None)
-    idRenta_enc: int
-    idPelicula: int
+    idRenta_enc: Optional[int] = Field(None)
+    idPelicula: int = Field(gt=0)
     cantidad: int = Field(gt=0)
-    precio: Optional[float] = Field(gt=0)
+    precio: Optional[float] = Field(None)
 
     class Config:
         from_attributes = True
         json_schema_extra = {
             "example": {
-                "idRenta_enc": 1,
                 "idPelicula": 1,
-                "cantidad": 2,
-                "precio": 50.0
+                "cantidad": 2
             }
         }

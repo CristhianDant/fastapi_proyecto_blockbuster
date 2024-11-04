@@ -21,7 +21,7 @@ def validate_token(token: str) -> dict:
     Validate a jwt tocken
     """
     try:
-        print(token)
+        #print(token)
         data = decode(jwt=token, key=str(key), algorithms=['HS256'])
         return data
     except Exception as e:

@@ -224,7 +224,12 @@ class RentaServise:
         if renta_enc.fin_renta:
             raise ValueError("La renta ya ha sido finalizada")
         
-        
+        renta_det = self.db.query(Renta_detalle_database).filter(Renta_detalle_database.idRenta_enc == idRenta_enc).all()
+
+        for det in renta_det:
+            pelicula = PeliculasService(self.db).get_pelicula(det.idPelicula)
+            if pelicula:
+                PeliculasService(self.db).aumentar_cantidad(pelicula.idPelicula, det.cantidad)
 
         renta_enc.fin_renta = True
         renta_enc.fecha_fin = datetime.now()

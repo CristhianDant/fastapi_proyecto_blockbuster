@@ -1,23 +1,13 @@
-# ffrom fastapi import APIRouter
-# from fastapi import Depends, Path, Query
-# from fastapi.responses import JSONResponse
-# from pydantic import BaseModel, Field
-# from typing import Optional, List
-# from config.database import Session
-# from models.movie import Movie as MovieModel
-# from fastapi.encoders import jsonable_encoder
-# from middlewares.jwt_bearer import JWTBearer
-# from services.movie import MovieService
 
 
-
-from fastapi import APIRouter , Depends , Path , Query , status
+from fastapi import APIRouter , Depends , Path , Query , status 
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List
 
 from config.database import Session
 from .servise import ClientService , Cliente 
+from middlewares.JWT_bearer import JWTBearer
 ## Create a new router
 cliente_router = APIRouter()
 
@@ -55,7 +45,8 @@ def get_cliente_by_name(nombre:str):
     return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(result))
 
 @cliente_router.post('/clientes', tags=['clientes'], 
-    status_code=status.HTTP_201_CREATED)
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(JWTBearer())])
 def create_cliente(cliente: Cliente) -> JSONResponse:
     """
     Endpoint para crear un nuevo cliente
@@ -74,7 +65,9 @@ def create_cliente(cliente: Cliente) -> JSONResponse:
 
 
 
-@cliente_router.put('/clientes/{idCliente}', tags=['clientes'], status_code=status.HTTP_200_OK)
+@cliente_router.put('/clientes/{idCliente}', tags=['clientes'], 
+                    status_code=status.HTTP_200_OK,
+                    dependencies=[Depends(JWTBearer())])
 def update_cliente(idCliente:int, cliente: Cliente) -> dict:
     """
     Endpoint para actualizar un cliente
@@ -95,7 +88,9 @@ def update_cliente(idCliente:int, cliente: Cliente) -> dict:
 
 
 
-@cliente_router.delete('/clientes/{idCliente}', tags=['clientes'], status_code=status.HTTP_200_OK)
+@cliente_router.delete('/clientes/{idCliente}', 
+                    tags=['clientes'], status_code=status.HTTP_200_OK,
+                    dependencies=[Depends(JWTBearer())])
 def delete_cliente(idCliente:int) -> dict:
     """
     Endpoint para eliminar un cliente
