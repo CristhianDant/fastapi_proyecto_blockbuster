@@ -1,5 +1,5 @@
 from fastapi import FastAPI , status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse , RedirectResponse
 
 from config.database import engine , Base
 
@@ -33,13 +33,10 @@ app.include_router(loguin_router)
 ## Create database tables
 Base.metadata.create_all(bind=engine)
 
-@app.get("/")
+@app.get("/" , tags=["Root"])
 def read_root():
     """
-    Endpoint de bienvenida 
+    Este endpoint redirige a la documentación de la API
     """
-    return JSONResponse(
-        content={"message": "Hello World"},
-        status_code=status.HTTP_200_OK
-    )
+    return RedirectResponse(url="/docs")
 
