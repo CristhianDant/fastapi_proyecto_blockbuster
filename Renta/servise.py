@@ -124,13 +124,19 @@ class RentaServise:
             renta_det_data = item.model_dump()
             
             renta_det_data['idRenta_enc'] = idRenta_enc
+
             pelicula = PeliculasService(self.db).get_pelicula(renta_det_data['idPelicula'])
+
             if not pelicula:
                 raise ValueError("Pelicula no encontrada")
+
             renta_det_data['precio'] = pelicula.costo
             new_renta_det = Renta_detalle_database(**renta_det_data)
+
             total += renta_det_data['cantidad'] * renta_det_data['precio']
+
             PeliculasService(self.db).disminuir_cantidad(idPelicula=renta_det_data['idPelicula'], cantidad=renta_det_data['cantidad'])
+
             self.db.add(new_renta_det)
 
         return total
@@ -147,7 +153,7 @@ class RentaServise:
         total = self._reguister_renta_det(id , detalle)
         # Valores por defecto
         renta_enc_data['fecha_inicio'] = datetime.now()
-        renta_enc_data['fin_renta'] 
+        renta_enc_data['fin_renta'] = ""
         renta_enc_data['total'] = total
         renta_enc_data['iva'] = total * 0.18
         renta_enc_data['subtotal'] = total - renta_enc_data['iva']

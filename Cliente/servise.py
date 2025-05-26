@@ -21,6 +21,7 @@ class ClientService(Cliente_database):
         # ## Ascendente
         # result = self.db.execute(select(Cliente_database).order_by(Cliente_database.idCliente.asc()))
         # clientes = result.scalars().all()
+
         result = self.db.execute(
             select(Cliente_database.idCliente,
                 Cliente_database.nombre,

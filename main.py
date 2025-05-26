@@ -1,5 +1,7 @@
+import uvicorn
 from fastapi import FastAPI , status
 from fastapi.responses import JSONResponse , RedirectResponse
+
 
 from config.database import engine , Base
 
@@ -39,4 +41,9 @@ def read_root():
     Este endpoint redirige a la documentación de la API
     """
     return RedirectResponse(url="/docs")
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=5050)
+
+
 
