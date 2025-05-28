@@ -35,43 +35,39 @@ class PersonalService(Personal_database):
         """
         Get all the personals
         """
-        personals_list = []
-        result = self.db.execute(
-            text('''
-                SELECT
-                    idPersonal,
-                    nombre,
-                    direcion,
-                    telefono,
-                    fecha_registro,
-                    email
-                FROM
-                    Personal
-                ORDER BY
-                    idPersonal DESC;
-            ''')).fetchall()
 
-        return result    
-    
+        result = self.db.execute(text('''
+        SELECT
+            idPersonal,
+            nombre,
+            direcion,
+            telefono,
+            fecha_registro,
+            email
+        FROM
+            Personal
+        ''')).mappings().all()
+
+        return result
+
     def get_personal(self, idPersonal):
         """
         Get a personal by id
         """
-        # result = self.db.query(Personal_database).filter(Personal_database.idPersonal == idPersonal).first()
-        # if result:
-        #     result.password = '********'
-        # return result
 
-        result = self.db.execute(
-            select(
-            Personal_database.idPersonal,
-            Personal_database.nombre,
-            Personal_database.direcion,
-            Personal_database.telefono,
-            Personal_database.fecha_registro,
-            Personal_database.email)
-            .where(Personal_database.idPersonal == idPersonal)
-        ).mappings().first()
+        result = self.db.execute(text('''
+        SELECT
+            idPersonal,
+            nombre,
+            direcion,
+            telefono,
+            fecha_registro,
+            email
+        FROM
+            Personal
+        WHERE
+            idPersonal = :idPersonal
+        '''), {'idPersonal': idPersonal}).mappings().first()
 
         return result
     

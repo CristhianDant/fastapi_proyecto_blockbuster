@@ -16,7 +16,6 @@ def get_personals():
     db = Session()
     result = PersonalService(db).get_personals()
 
-    print(f'')
     return JSONResponse(status_code=200, content=jsonable_encoder(result))
 
 

@@ -3,6 +3,9 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String , DateTime  
 from pydantic import BaseModel , Field
 from typing import Optional
+from sqlalchemy import event
+from sqlalchemy.orm import Session
+from datetime import datetime
 
 class Personal_database(Base):
     __tablename__ = 'Personal'

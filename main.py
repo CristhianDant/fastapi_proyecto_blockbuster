@@ -5,8 +5,6 @@ from fastapi.responses import JSONResponse , RedirectResponse
 
 from config.database import engine , Base
 
-### SHELL COMMANDS
-# uvicorn main:app --reload --port 5050
 
 app = FastAPI()
 app.title = "My Api BlockBuster"
