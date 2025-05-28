@@ -3,7 +3,7 @@ from datetime import datetime
 
 from .models import Personal , Personal_database 
 
-from sqlalchemy import select
+from sqlalchemy import select , text
 
 class PersonalService(Personal_database):
     def __init__(self , db):
@@ -37,15 +37,19 @@ class PersonalService(Personal_database):
         """
         personals_list = []
         result = self.db.execute(
-            select(
-            Personal_database.idPersonal,
-            Personal_database.nombre,
-            Personal_database.direcion,
-            Personal_database.telefono,
-            Personal_database.fecha_registro,
-            Personal_database.email)
-            .order_by(Personal_database.idPersonal.desc())
-        ).mappings().all()
+            text('''
+                SELECT
+                    idPersonal,
+                    nombre,
+                    direcion,
+                    telefono,
+                    fecha_registro,
+                    email
+                FROM
+                    Personal
+                ORDER BY
+                    idPersonal DESC;
+            ''')).fetchall()
 
         return result    
     

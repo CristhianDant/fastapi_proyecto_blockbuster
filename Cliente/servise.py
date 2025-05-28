@@ -1,6 +1,7 @@
 from datetime import datetime
 from .models import Cliente , Cliente_database 
-from sqlalchemy import select
+from sqlalchemy import select , text
+
 
 class ClientService(Cliente_database):
     def __init__(self , db):
@@ -10,7 +11,8 @@ class ClientService(Cliente_database):
         """
         Get all the clients
         """
-        result = self.db.query(Cliente_database).all()
+        sql_query = text("SELECT * FROM Cliente")
+        result = self.db.execute(sql_query).fetchall()
         return result
     
 
